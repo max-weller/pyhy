@@ -8,7 +8,8 @@ ffibuilder = cffi.FFI()
 ffibuilder.set_source(
     "_libhydrogen",
     """#include <hydrogen.h>""",
-    libraries=['hydrogen']
+    sources=['libhydrogen/hydrogen.c'],
+    include_dirs=['libhydrogen']
 )
 
 with open(os.path.join(os.path.dirname(__file__), "pyhy.h")) as f:
