@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 from setuptools import find_packages, setup
 
-NAME = 'pyhy'
-VERS = '0.0.7'
+NAME = 'pyhy-local'
+VERS = '0.0.8rc2'
 PACKAGES = [ 'pyhy' ]
 SHORT_DESC = 'bindings for libhydrogen using cffi'
 LONG_DESC = """Python bindings for libhydrogen, a small cryptographic library
@@ -32,7 +32,7 @@ if __name__ == '__main__':
         description=SHORT_DESC,
         long_description=LONG_DESC,
         license='BSD',
-        url='https://github.com/someburner/pyhy',
+        url='https://github.com/max-weller/pyhy',
         author='Jeff Hufford',
         author_email='jeffrey92@gmail.com',
         maintainer='Jeff Hufford',

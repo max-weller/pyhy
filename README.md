@@ -1,15 +1,15 @@
-# pyhy
+# pyhy-local
 
 Python bindings for [libhydrogen](https://github.com/jedisct1/libhydrogen).
 
 ## Install
 
-Requires [libhydrogen](https://github.com/jedisct1/libhydrogen) to be installed
+Does not require [libhydrogen](https://github.com/jedisct1/libhydrogen) to be installed
 on system. Testing/development has been done on linux, specifically Ubuntu
 18.04. Additional work may be required for other platforms/distros.
 
 ```sh
-pip3 install pyhy
+pip3 install pyhy-local
 ```
 
 ## Usage
