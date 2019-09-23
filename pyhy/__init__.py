@@ -171,12 +171,12 @@ class hydro_hash(object):
         assert (type(ctx) == str) and (len(ctx) == h.hydro_kdf_CONTEXTBYTES)
         assert len(key) == h.hydro_hash_KEYBYTES
         self.st = ffi.new('struct hydro_hash_state *')
-        h.hydro_hash_init(self.st, ctx.encode('utf8'), key)
+        h.hydro_hash_init(self.st, ctx, key)
 
     def update(self, m):
         mlen = len(m)
         # print('update: +%d' % mlen)
-        h.hydro_hash_update(self.st, m.encode('utf8'), mlen)
+        h.hydro_hash_update(self.st, m, mlen)
 
     def final(self):
         """use secret key to generate a signature"""
@@ -194,7 +194,7 @@ def hydro_hash_hash(outlen, d, ctx, key=None):
     buf = ffi.new('uint8_t[]', outlen)
     if key is None:
         key = ffi.NULL
-    if h.hydro_hash_hash(buf, outlen, d.encode('utf8'), dlen, ctx.encode('utf8'), key) == -1:
+    if h.hydro_hash_hash(buf, outlen, d, dlen, ctx, key) == -1:
         return None
     return bytes(buf)
 
@@ -216,7 +216,7 @@ def hydro_kdf_derive_from_key(subkey_len, id, ctx, master_key):
     assert ((subkey_len >= h.hydro_kdf_BYTES_MIN) and (subkey_len <= h.hydro_kdf_BYTES_MAX))
     assert (type(ctx) == str) and (len(ctx) == h.hydro_kdf_CONTEXTBYTES)
     buf = ffi.new('uint8_t[]', subkey_len)
-    h.hydro_kdf_derive_from_key(buf, subkey_len, id, ctx.encode('utf8'), master_key)
+    h.hydro_kdf_derive_from_key(buf, subkey_len, id, ctx, master_key)
     return bytes(buf)
 
 ################################################################################
@@ -239,7 +239,7 @@ def hydro_secretbox_encrypt(m, mid, ctx, key):
     if not mlen:
         return bytes(0)
     buf = ffi.new('uint8_t[]', mlen + h.hydro_secretbox_HEADERBYTES)
-    h.hydro_secretbox_encrypt(buf, m.encode('utf8'), mlen, mid, ctx.encode('utf8'), key)
+    h.hydro_secretbox_encrypt(buf, m, mlen, mid, ctx, key)
     return bytes(buf)
 
 def hydro_secretbox_decrypt(c, mid, ctx, key):
@@ -248,7 +248,7 @@ def hydro_secretbox_decrypt(c, mid, ctx, key):
     if clen <= h.hydro_secretbox_HEADERBYTES:
         return None
     buf = ffi.new('uint8_t[]', clen - h.hydro_secretbox_HEADERBYTES)
-    if h.hydro_secretbox_decrypt(buf, c, clen, mid, ctx.encode('utf8'), key) != 0:
+    if h.hydro_secretbox_decrypt(buf, c, clen, mid, ctx, key) != 0:
         return None
     return bytes(buf)
 
@@ -256,14 +256,14 @@ def hydro_secretbox_probe_create(c, ctx, key):
     assert (type(ctx) == str) and (len(ctx) == h.hydro_kdf_CONTEXTBYTES)
     clen = len(c)
     buf = ffi.new('uint8_t[]', h.hydro_secretbox_PROBEBYTES)
-    h.hydro_secretbox_probe_create(buf, c, clen, ctx.encode('utf8'), key)
+    h.hydro_secretbox_probe_create(buf, c, clen, ctx, key)
     return bytes(buf)
 
 # NOTE/TODO: appears probe verif is not that strict about clen
 def hydro_secretbox_probe_verify(p, c, ctx, key):
     assert (type(ctx) == str) and (len(ctx) == h.hydro_kdf_CONTEXTBYTES)
     clen = len(c)
-    if (h.hydro_secretbox_probe_verify(p, c, clen, ctx.encode('utf8'), key) == 0):
+    if (h.hydro_secretbox_probe_verify(p, c, clen, ctx, key) == 0):
         return True
     return False
 
@@ -291,13 +291,13 @@ def hydro_sign_create(m, ctx, secret_key):
     assert (type(ctx) == str) and (len(ctx) == h.hydro_kdf_CONTEXTBYTES)
     buf = ffi.new('uint8_t[]', h.hydro_sign_BYTES)
     mlen = len(m)
-    h.hydro_sign_create(buf, m.encode('utf8'), mlen, ctx.encode('utf8'), secret_key)
+    h.hydro_sign_create(buf, m, mlen, ctx, secret_key)
     return bytes(buf)
 
 def hydro_sign_verify(sig, m, ctx, public_key):
     assert (type(ctx) == str) and (len(ctx) == h.hydro_kdf_CONTEXTBYTES)
     mlen = len(m)
-    result = h.hydro_sign_verify(sig, m.encode('utf-8'), mlen, ctx.encode('utf-8'), public_key)
+    result = h.hydro_sign_verify(sig, m, mlen, ctx, public_key)
     return result == 0
 
 class hydro_sign(object):
@@ -306,12 +306,12 @@ class hydro_sign(object):
         """Creates a hydro_sign_state object with (required) ctx"""
         assert (type(ctx) == str) and (len(ctx) == h.hydro_kdf_CONTEXTBYTES)
         self.st = ffi.new('hydro_sign_state *')
-        h.hydro_sign_init(self.st, ctx.encode('utf8'))
+        h.hydro_sign_init(self.st, ctx)
 
     def update(self, m):
         mlen = len(m)
         # print('update: +%d' % mlen)
-        h.hydro_sign_update(self.st, m.encode('utf8'), mlen)
+        h.hydro_sign_update(self.st, m, mlen)
 
     def final_create(self, secret_key, wipe=True):
         """use secret key to generate a signature"""
@@ -530,7 +530,7 @@ def hydro_pwhash_keygen():
 def hydro_pwhash_deterministic(pw, ctx, master_key, ops_limit=10000, mem_limit=0, threads=1):
     buf = ffi.new('uint8_t[]', 32)
     pwlen = len(pw)
-    h.hydro_pwhash_deterministic(buf, 32, pw.encode('utf8'), pwlen, ctx.encode('utf8'), master_key, ops_limit, mem_limit, threads)
+    h.hydro_pwhash_deterministic(buf, 32, pw, pwlen, ctx, master_key, ops_limit, mem_limit, threads)
     return bytes(buf)
 
 def hydro_pwhash_create():
